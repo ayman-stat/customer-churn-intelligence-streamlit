@@ -26,100 +26,121 @@ def train_models(sample_size: int, random_seed: int):
     return train_candidate_models(X, y, feature_names)
 
 
-st.title("Customer Churn Intelligence")
-st.caption("A portfolio-grade Streamlit ML app for churn prediction, retention analytics, and executive decision support.")
+def main():
+    st.title("Customer Churn Intelligence")
+    st.caption(
+        "A portfolio-grade Streamlit ML app for churn prediction, retention analytics, and executive decision support."
+    )
 
-with st.sidebar:
-    st.header("Controls")
-    sample_size = st.slider("Customer sample size", 500, 5000, 1500, step=500)
-    random_seed = st.number_input("Random seed", value=42, step=1)
-    risk_threshold = st.slider("High-risk threshold", 0.30, 0.90, 0.60, step=0.05)
+    with st.sidebar:
+        st.header("Controls")
+        sample_size = st.slider("Customer sample size", 500, 5000, 1500, step=500)
+        random_seed = st.number_input("Random seed", value=42, step=1)
+        risk_threshold = st.slider("High-risk threshold", 0.30, 0.90, 0.60, step=0.05)
 
-df = load_data(sample_size, random_seed)
-model_result = train_models(sample_size, random_seed)
-scored = model_result.scored_data.copy()
-scored["risk_band"] = scored["churn_probability"].apply(
-    lambda p: "High Risk" if p >= risk_threshold else ("Medium Risk" if p >= 0.35 else "Low Risk")
-)
+    # Load data and models inside the UI lifecycle so exceptions can be caught
+    df = load_data(sample_size, random_seed)
+    model_result = train_models(sample_size, random_seed)
+    scored = model_result.scored_data.copy()
+    scored["risk_band"] = scored["churn_probability"].apply(
+        lambda p: "High Risk" if p >= risk_threshold else ("Medium Risk" if p >= 0.35 else "Low Risk")
+    )
 
-total_customers = len(scored)
-churn_rate = scored["churned"].mean()
-high_risk_share = (scored["risk_band"] == "High Risk").mean()
-expected_at_risk_revenue = scored.loc[scored["risk_band"] == "High Risk", "monthly_revenue"].sum()
+    total_customers = len(scored)
+    churn_rate = scored["churned"].mean()
+    high_risk_share = (scored["risk_band"] == "High Risk").mean()
+    expected_at_risk_revenue = scored.loc[scored["risk_band"] == "High Risk", "monthly_revenue"].sum()
 
-kpi_cols = st.columns(4)
-kpi_cols[0].metric("Customers", f"{total_customers:,}")
-kpi_cols[1].metric("Observed Churn Rate", format_pct(churn_rate))
-kpi_cols[2].metric("High-Risk Share", format_pct(high_risk_share))
-kpi_cols[3].metric("High-Risk Monthly Revenue", f"${expected_at_risk_revenue:,.0f}")
+    kpi_cols = st.columns(4)
+    kpi_cols[0].metric("Customers", f"{total_customers:,}")
+    kpi_cols[1].metric("Observed Churn Rate", format_pct(churn_rate))
+    kpi_cols[2].metric("High-Risk Share", format_pct(high_risk_share))
+    kpi_cols[3].metric("High-Risk Monthly Revenue", f"${expected_at_risk_revenue:,.0f}")
 
-st.divider()
+    st.divider()
 
-left, right = st.columns([1.15, 0.85])
+    left, right = st.columns([1.15, 0.85])
 
-with left:
-    st.subheader("Churn Risk by Segment")
-    segment_summary = (
-        scored.groupby("customer_segment", as_index=False)
-        .agg(
-            customers=("customer_id", "count"),
-            churn_rate=("churned", "mean"),
-            avg_probability=("churn_probability", "mean"),
-            monthly_revenue=("monthly_revenue", "sum"),
+    with left:
+        st.subheader("Churn Risk by Segment")
+        segment_summary = (
+            scored.groupby("customer_segment", as_index=False)
+            .agg(
+                customers=("customer_id", "count"),
+                churn_rate=("churned", "mean"),
+                avg_probability=("churn_probability", "mean"),
+                monthly_revenue=("monthly_revenue", "sum"),
+            )
+            .sort_values("avg_probability", ascending=False)
         )
-        .sort_values("avg_probability", ascending=False)
-    )
-    fig = px.bar(
-        segment_summary,
-        x="customer_segment",
-        y="avg_probability",
-        color="monthly_revenue",
-        text=segment_summary["avg_probability"].map(format_pct),
-        labels={
-            "customer_segment": "Customer Segment",
-            "avg_probability": "Average Predicted Churn Risk",
-            "monthly_revenue": "Monthly Revenue",
-        },
-    )
-    fig.update_layout(height=430, coloraxis_colorbar_title="Revenue")
-    st.plotly_chart(fig, use_container_width=True)
+        fig = px.bar(
+            segment_summary,
+            x="customer_segment",
+            y="avg_probability",
+            color="monthly_revenue",
+            text=segment_summary["avg_probability"].map(format_pct),
+            labels={
+                "customer_segment": "Customer Segment",
+                "avg_probability": "Average Predicted Churn Risk",
+                "monthly_revenue": "Monthly Revenue",
+            },
+        )
+        fig.update_layout(height=430, coloraxis_colorbar_title="Revenue")
+        st.plotly_chart(fig, use_container_width=True)
 
-with right:
-    st.subheader("Model Leaderboard")
-    leaderboard = model_result.leaderboard.copy()
-    leaderboard["roc_auc"] = leaderboard["roc_auc"].round(3)
-    leaderboard["average_precision"] = leaderboard["average_precision"].round(3)
-    leaderboard["recall_at_threshold"] = leaderboard["recall_at_threshold"].round(3)
-    st.dataframe(leaderboard, hide_index=True, use_container_width=True)
+    with right:
+        st.subheader("Model Leaderboard")
+        leaderboard = model_result.leaderboard.copy()
+        leaderboard["roc_auc"] = leaderboard["roc_auc"].round(3)
+        leaderboard["average_precision"] = leaderboard["average_precision"].round(3)
+        leaderboard["recall_at_threshold"] = leaderboard["recall_at_threshold"].round(3)
+        st.dataframe(leaderboard, hide_index=True, use_container_width=True)
 
-    st.subheader("Recommended Retention Plays")
-    st.markdown(
-        """
+        st.subheader("Recommended Retention Plays")
+        st.markdown(
+            """
 - **High engagement drop:** trigger proactive outreach and personalized reactivation offer.
 - **High value and high risk:** route to premium retention queue.
 - **Low visits but long tenure:** propose habit-building plan and next-best activity.
 - **Price sensitivity:** test lower-cost renewal bundle or targeted discount.
 """
-    )
+        )
 
-st.divider()
-st.subheader("High-Risk Customer Watchlist")
-watchlist = (
-    scored.sort_values("churn_probability", ascending=False)
-    .loc[
-        :,
-        [
-            "customer_id",
-            "customer_segment",
-            "tenure_months",
-            "monthly_revenue",
-            "visits_last_30d",
-            "support_tickets_90d",
-            "churn_probability",
-            "risk_band",
-        ],
-    ]
-    .head(25)
-)
-watchlist["churn_probability"] = watchlist["churn_probability"].map(format_pct)
-st.dataframe(watchlist, hide_index=True, use_container_width=True)
+    st.divider()
+    st.subheader("High-Risk Customer Watchlist")
+    watchlist = (
+        scored.sort_values("churn_probability", ascending=False)
+        .loc[
+            :,
+            [
+                "customer_id",
+                "customer_segment",
+                "tenure_months",
+                "monthly_revenue",
+                "visits_last_30d",
+                "support_tickets_90d",
+                "churn_probability",
+                "risk_band",
+            ],
+        ]
+        .head(25)
+    )
+    watchlist["churn_probability"] = watchlist["churn_probability"].map(format_pct)
+    st.dataframe(watchlist, hide_index=True, use_container_width=True)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as exc:  # capture unexpected startup errors for debugging on Streamlit Cloud
+        import traceback
+
+        tb = traceback.format_exc()
+        try:
+            st.error("The app failed to start — captured the exception below.")
+            st.text(tb)
+        except Exception:
+            # If Streamlit itself is unstable, still write an error file to help remote debugging
+            with open("streamlit_startup_error.log", "w") as fh:
+                fh.write(tb)
+
