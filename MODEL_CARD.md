@@ -3,8 +3,8 @@
 ## Purpose
 
 This model card documents a public portfolio demo for churn prediction and retention prioritization.
-The project is designed to show Senior Data Scientist / AI Lead thinking across business framing,
-modeling, decision support, governance, and deployment readiness.
+The project is designed to show senior data science ownership across business framing, modeling,
+decision support, governance, and deployment readiness.
 
 ## Intended Use
 

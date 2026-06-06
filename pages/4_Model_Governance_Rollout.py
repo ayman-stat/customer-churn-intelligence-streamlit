@@ -1,25 +1,25 @@
 import streamlit as st
 
 
-st.set_page_config(page_title="AI Leadership & Governance", layout="wide")
-st.title("AI Leadership & Governance")
-st.caption("How this churn model would be governed, measured, and operationalized beyond a notebook demo.")
+st.set_page_config(page_title="Model Governance & Rollout", layout="wide")
+st.title("Model Governance & Rollout")
+st.caption("A practical checklist for moving churn scores from demo output into campaign operations.")
 
 left, right = st.columns([1, 1])
 
 with left:
-    st.subheader("Decision Architecture")
+    st.subheader("Operating Model")
     st.markdown(
         """
 - Define the business objective: retained revenue, churn reduction, or campaign ROI.
-- Score eligible customers, not the full population blindly.
+- Score eligible customers rather than the full population by default.
 - Combine churn risk with value, offer cost, contact policy, and intervention capacity.
-- Use model output as decision support, not uncontrolled automation.
+- Use model output as decision support, with business rules around activation.
 - Track outcomes through target/control design before claiming uplift.
 """
     )
 
-    st.subheader("Executive Questions")
+    st.subheader("Questions Before Launch")
     st.markdown(
         """
 - Which segment is most exposed?
@@ -31,7 +31,7 @@ with left:
     )
 
 with right:
-    st.subheader("Governance Controls")
+    st.subheader("Controls Before Activation")
     st.markdown(
         """
 - Approved feature definitions and data lineage.
@@ -42,7 +42,7 @@ with right:
 """
     )
 
-    st.subheader("MLOps Roadmap")
+    st.subheader("Rollout Roadmap")
     st.markdown(
         """
 - Add MLflow experiment tracking and model registry.
@@ -55,9 +55,8 @@ with right:
 
 st.divider()
 
-st.subheader("AI Lead Interpretation")
+st.subheader("Delivery Readiness")
 st.info(
-    "The senior value of this project is not the classifier alone. It is the full decision system: "
-    "business framing, risk scoring, prioritization, financial assumptions, experimentation, governance, "
-    "and deployment readiness."
+    "At production level, the model is only one part of the work. The important part is connecting "
+    "risk scores to campaign capacity, financial assumptions, measurement design, and monitored rollout."
 )

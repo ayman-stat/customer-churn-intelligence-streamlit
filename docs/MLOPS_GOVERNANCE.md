@@ -47,7 +47,7 @@ The current app is intentionally lightweight and public:
 - Explainability review before stakeholder adoption.
 - Clear distinction between decision support and automated decisioning.
 
-## AI Lead Signals
+## Leadership Signals
 
 This roadmap demonstrates ownership beyond model training:
 

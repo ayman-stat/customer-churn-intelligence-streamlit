@@ -44,7 +44,7 @@ The goal is not only to maximize AUC. A useful churn model should help teams:
 """
 )
 
-st.subheader("Senior DS / AI Lead Review Checklist")
+st.subheader("Senior Review Checklist")
 st.markdown(
     """
 - **Problem framing:** define whether the objective is churn reduction, retained revenue, or campaign ROI.

@@ -44,7 +44,7 @@ Core app and analytics:
 - **Plotly:** executive analytics visualizations and segment risk views.
 - **pytest:** smoke tests for data generation and model training.
 
-Senior DS / AI Lead practices demonstrated:
+Senior delivery practices demonstrated:
 
 - Decision intelligence and executive KPI framing.
 - Model governance through a model card and production controls.
@@ -104,7 +104,7 @@ customer-churn-intelligence-streamlit/
 │   ├── 1_Data_Explorer.py
 │   ├── 2_Model_Lab.py
 │   ├── 3_Customer_Scoring.py
-│   └── 4_AI_Leadership_Governance.py
+│   └── 4_Model_Governance_Rollout.py
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── EXPERIMENT_DESIGN.md
