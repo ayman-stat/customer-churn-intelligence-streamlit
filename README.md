@@ -81,6 +81,11 @@ If the environment is already created:
 streamlit run app.py
 ```
 
+## Deployment
+
+For Streamlit Community Cloud, deploy from `main` with entrypoint `app.py` and select **Python 3.11**
+from Advanced settings. See [DEPLOYMENT.md](DEPLOYMENT.md) for the exact settings.
+
 ## Quality Check
 
 Run the smoke tests:
