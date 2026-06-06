@@ -44,3 +44,13 @@ The goal is not only to maximize AUC. A useful churn model should help teams:
 """
 )
 
+st.subheader("Senior DS / AI Lead Review Checklist")
+st.markdown(
+    """
+- **Problem framing:** define whether the objective is churn reduction, retained revenue, or campaign ROI.
+- **Threshold strategy:** select thresholds by intervention capacity and expected marginal value, not only model accuracy.
+- **Experiment design:** reserve a control group so uplift is measured rather than assumed.
+- **Monitoring:** track drift, score stability, campaign fatigue, false positives, and retention outcome windows.
+- **Governance:** document data lineage, feature definitions, privacy constraints, retraining cadence, and human override paths.
+"""
+)

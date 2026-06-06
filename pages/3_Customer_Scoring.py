@@ -60,6 +60,10 @@ with right:
     else:
         st.write("Maintain engagement with light-touch personalized content.")
 
+    st.subheader("Decision Controls")
+    st.write(
+        "In production, this score should be combined with offer eligibility, contact policy, recent campaign exposure, and target/control assignment before activation."
+    )
+
 st.subheader("Profile Sent to Model")
 st.dataframe(profile, hide_index=True, use_container_width=True)
-

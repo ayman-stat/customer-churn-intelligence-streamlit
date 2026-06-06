@@ -29,7 +29,7 @@ def train_models(sample_size: int, random_seed: int):
 def main():
     st.title("Customer Churn Intelligence")
     st.caption(
-        "A portfolio-grade Streamlit ML app for churn prediction, retention analytics, and executive decision support."
+        "A senior-level ML product demo for churn prediction, retention prioritization, and executive decision support."
     )
 
     with st.sidebar:
@@ -37,6 +37,10 @@ def main():
         sample_size = st.slider("Customer sample size", 500, 5000, 1500, step=500)
         random_seed = st.number_input("Random seed", value=42, step=1)
         risk_threshold = st.slider("High-risk threshold", 0.30, 0.90, 0.60, step=0.05)
+        st.header("Decision Assumptions")
+        intervention_capacity = st.slider("Targetable member share", 0.05, 0.40, 0.15, step=0.05)
+        expected_save_rate = st.slider("Assumed save rate", 0.02, 0.25, 0.18, step=0.01)
+        monthly_offer_cost = st.slider("Offer cost per target", 5, 100, 15, step=5)
 
     # Load data and models inside the UI lifecycle so exceptions can be caught
     df = load_data(sample_size, random_seed)
@@ -50,12 +54,34 @@ def main():
     churn_rate = scored["churned"].mean()
     high_risk_share = (scored["risk_band"] == "High Risk").mean()
     expected_at_risk_revenue = scored.loc[scored["risk_band"] == "High Risk", "monthly_revenue"].sum()
+    target_count = max(1, int(total_customers * intervention_capacity))
+    target_segment = scored.sort_values("churn_probability", ascending=False).head(target_count)
+    target_revenue = target_segment["monthly_revenue"].sum()
+    estimated_retained_revenue = target_revenue * expected_save_rate
+    estimated_offer_cost = target_count * monthly_offer_cost
+    estimated_net_value = estimated_retained_revenue - estimated_offer_cost
 
     kpi_cols = st.columns(4)
     kpi_cols[0].metric("Customers", f"{total_customers:,}")
     kpi_cols[1].metric("Observed Churn Rate", format_pct(churn_rate))
     kpi_cols[2].metric("High-Risk Share", format_pct(high_risk_share))
     kpi_cols[3].metric("High-Risk Monthly Revenue", f"${expected_at_risk_revenue:,.0f}")
+
+    st.divider()
+    st.subheader("Executive Decision Layer")
+    decision_cols = st.columns(4)
+    decision_cols[0].metric("Recommended Target Segment", f"{target_count:,}")
+    decision_cols[1].metric("Target Revenue Exposure", f"${target_revenue:,.0f}")
+    decision_cols[2].metric("Estimated Retained Revenue", f"${estimated_retained_revenue:,.0f}")
+    decision_cols[3].metric("Net Value Scenario", f"${estimated_net_value:,.0f}")
+
+    st.markdown(
+        """
+This layer converts model scores into an operating decision: who to target, how much revenue is exposed,
+what intervention cost is assumed, and how the campaign should be evaluated through target/control measurement.
+All values are synthetic and scenario-based for portfolio demonstration.
+"""
+    )
 
     st.divider()
 
@@ -103,6 +129,17 @@ def main():
 - **High value and high risk:** route to premium retention queue.
 - **Low visits but long tenure:** propose habit-building plan and next-best activity.
 - **Price sensitivity:** test lower-cost renewal bundle or targeted discount.
+"""
+        )
+
+        st.subheader("Production & Governance Notes")
+        st.markdown(
+            """
+- Keep model training data separate from campaign execution data.
+- Use target/control groups before claiming business uplift.
+- Monitor drift in visit frequency, support tickets, tenure, and offer response.
+- Review fairness and policy constraints before automated offers.
+- Publish a model card before operational rollout.
 """
         )
 
