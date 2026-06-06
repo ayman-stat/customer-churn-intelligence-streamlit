@@ -31,7 +31,7 @@ st.caption("A portfolio-grade Streamlit ML app for churn prediction, retention a
 
 with st.sidebar:
     st.header("Controls")
-    sample_size = st.slider("Customer sample size", 500, 10000, 2500, step=500)
+    sample_size = st.slider("Customer sample size", 500, 5000, 1500, step=500)
     random_seed = st.number_input("Random seed", value=42, step=1)
     risk_threshold = st.slider("High-risk threshold", 0.30, 0.90, 0.60, step=0.05)
 

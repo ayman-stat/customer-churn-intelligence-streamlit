@@ -42,7 +42,7 @@ def train_candidate_models(X: pd.DataFrame, y: pd.Series, feature_names: list[st
     candidates = {
         "Logistic Regression": LogisticRegression(max_iter=1000, class_weight="balanced"),
         "Random Forest": RandomForestClassifier(
-            n_estimators=250,
+            n_estimators=120,
             max_depth=8,
             min_samples_leaf=12,
             class_weight="balanced",
@@ -111,4 +111,3 @@ def extract_feature_importance(pipeline: Pipeline) -> pd.DataFrame:
 
     clean_names = [name.replace("categorical__", "").replace("numeric__", "") for name in names]
     return pd.DataFrame({"feature": clean_names, "importance": values})
-
